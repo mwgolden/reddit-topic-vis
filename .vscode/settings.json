@@ -1,0 +1,5 @@
+{
+  "python.analysis.extraPaths": [
+    "/home/matthew/sym_links/sda/Projects/layer-aws-api-token-cache"
+  ]
+}
