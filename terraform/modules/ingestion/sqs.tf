@@ -5,8 +5,7 @@ resource "aws_sqs_queue" "reddit_more_comments_queue" {
   visibility_timeout_seconds = 240
 }
 
-resource "aws_sqs_queue_policy" "reddit_more_commenrs_queue_policy" {
-  queue_url = aws_sqs_queue.reddit_more_comments_queue.id
-  policy = data.aws_iam_policy_document.sqs_policy.json
+resource "aws_lambda_event_source_mapping" "reddit_more_comments_event_source_mapping" {
+  event_source_arn = aws_sqs_queue.reddit_more_comments_queue.arn
+  function_name = aws_lambda_function.this["more_comments"].arn
 }
-

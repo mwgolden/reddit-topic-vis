@@ -6,9 +6,9 @@ import urllib3
 from api_token_cache import http_requests
 from api_token_cache.models import DynamoDbConfig
 
-ENDPOINT = "https://oauth.reddit.com/comments" #os.environ.get('API_ENDPOINT')
-BUCKET = "reddit-comments-wordcloud" #os.environ.get('S3_BUCKET')
-QUEUE_URL = ""
+ENDPOINT = os.environ.get('API_ENDPOINT')
+BUCKET = os.environ.get('S3_BUCKET')
+QUEUE_URL = os.environ.get('QUEUE_URL')
 
 def get_more_comment_ids(listings):
     more_comments_ids = []

@@ -5,7 +5,7 @@ data "aws_iam_policy_document" "lambda_assume_role" {
     effect = "Allow"
     actions = [ "sts:AssumeRole" ]
     principals {
-      type = "service"
+      type = "Service"
       identifiers = [ "lambda.amazonaws.com" ]
     }
   }
@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "lambda_s3_policy" {
         "s3:GetObject",
         "s3:List*"
      ]
-     resources = [ var.download_s3_path, "${var.download_s3_path}/*" ]
+     resources = [ var.download_s3_arn, "${var.download_s3_arn}/*" ]
   }
 }
 
@@ -45,19 +45,47 @@ data "aws_iam_policy_document" "publish_eventbridge_event" {
   }
 }
 
-data "aws_iam_policy_document" "sqs_policy" {
+data "aws_iam_policy_document" "sqs_producer_policy" {
   statement {
     effect = "Allow"
-    principals {
-      type = "*"
-      identifiers = [ "*" ]
-    }
     actions = [ "sqs:SendMessage" ]
-    resources = aws_sqs_queue.reddit_more_comments_queue.arn
-    condition {
-      test = "ArnEquals"
-      variable = "aws:SourceArn"
-      values = [ aws_lambda_function.this["comments"].arn ]
-    }
+    resources = [aws_sqs_queue.reddit_more_comments_queue.arn]
+  }
+}
+
+data "aws_iam_policy_document" "sqs_consumer_policy" {
+  statement {
+    effect = "Allow"
+    actions = [ 
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:ChangeMessageVisibility"
+     ]
+     resources = [ aws_sqs_queue.reddit_more_comments_queue.arn ]
+  }
+}
+
+data "aws_iam_policy_document" "dynamodb_read_policy" {
+  statement {
+    effect = "Allow"
+    actions = [ 
+      "dynamodb:GetItem",
+      "dynamodb:Query",
+      "dynamodb:Scan",
+      "dynamodb:DescribeTable"
+     ]
+     resources = [ data.aws_dynamodb_table.api_config_table.arn, data.aws_dynamodb_table.api_token_cache_table.arn ]
+  }
+}
+
+data "aws_iam_policy_document" "dynamodb_insert_policy" {
+  statement {
+    effect = "Allow"
+    actions = [ 
+      "dynamodb:PutItem",
+      "dynamodb:BatchWriteItem"
+     ]
+     resources = [ data.aws_dynamodb_table.api_token_cache_table.arn ]
   }
 }

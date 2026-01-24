@@ -4,7 +4,7 @@ variable "lambda_config" {
     function_name = string
     archive_src_path = string
     archive_build_path = string
-    handler = string
+    lambda_handler = string
     runtime = string
     environment_variables = map(any)
   }))
@@ -19,7 +19,14 @@ variable "lambda_config" {
   }
 }
 
-variable "download_s3_path" {
+variable "download_s3_arn" {
   type = string
-  description = "S3 path for ingested data"
+  description = "S3 arn for ingested data"
+}
+
+variable "api_token_cache_tables" {
+  type = object({
+    api_config_table = string,
+    api_token_cache_table = string
+  })
 }
