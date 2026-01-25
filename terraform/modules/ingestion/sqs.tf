@@ -8,4 +8,5 @@ resource "aws_sqs_queue" "reddit_more_comments_queue" {
 resource "aws_lambda_event_source_mapping" "reddit_more_comments_event_source_mapping" {
   event_source_arn = aws_sqs_queue.reddit_more_comments_queue.arn
   function_name = aws_lambda_function.this["more_comments"].arn
+  batch_size = 2
 }

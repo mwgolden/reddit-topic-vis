@@ -40,10 +40,9 @@ def lambda_handler(event, context):
         page = message['page']
         comment_ids = get_from_bucket(s3_bucket, bucket_key)
         next_comments = comment_ids[start:stop]
-        url = f'{ENDPOINT}?link_id=t3_{post_id}&children={",".join(next_comments).replace(",","%2C")}&api_type=json'
+        url = f'{ENDPOINT}?link_id=t3_{post_id}&morechildren={",".join(next_comments).replace(",","%2C")}&api_type=json'
         listings = http_requests.http_oauth_client_credentials(url=url, bot_name=bot_name, db_config=db_config, http=http_pool)
         res = save_to_bucket(json_object=listings, key=f'raw/comments/{post_id}/{page}_{post_id}.json')
-        print(res)
     return {
         "statusCode": 200,
         "body": ''

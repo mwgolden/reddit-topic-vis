@@ -58,15 +58,6 @@ def process_more_comments(comment_ids, post_id, more_comments_key, bot_name, que
         }
         queue_more_comments(post_id, msg, queue_url)
 
-    completion_message = {
-        "bot_name": bot_name,
-        "post_id": post_id,
-        "status": "complete",
-        "queue_url": queue_url
-    }
-    queue_more_comments(post_id, completion_message, queue_url)
-
-
 def lambda_handler(event, context):
     bot_name = event['bot_name']
     post_id = event['post_id']  
