@@ -21,7 +21,10 @@ module "ingestion" {
         archive_build_path = "../build/download-more-comments.zip",
         lambda_handler = "app.lambda_handler",
         runtime = "python3.12",
-        environment_variables = {}
+        environment_variables = {
+            "API_ENDPOINT": "https://oauth.reddit.com/comments",
+            "S3_BUCKET": aws_s3_bucket.com_wgolden_reddit.id
+        }
     }
   }
 }
