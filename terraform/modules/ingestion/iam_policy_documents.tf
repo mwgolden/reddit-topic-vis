@@ -89,3 +89,11 @@ data "aws_iam_policy_document" "dynamodb_insert_policy" {
      resources = [ data.aws_dynamodb_table.api_token_cache_table.arn ]
   }
 }
+
+data "aws_iam_policy_document" "publish_event" {
+  statement {
+    effect = "Allow"
+    actions = ["events:PutEvents" ]
+    resources = [ var.eventbridge_default_arn ]
+  }
+}

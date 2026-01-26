@@ -3,6 +3,7 @@ module "ingestion" {
   source = "./modules/ingestion"
   download_s3_arn = aws_s3_bucket.com_wgolden_reddit.arn
   api_token_cache_tables = var.api_token_cache_tables
+  eventbridge_default_arn =  local.eventbridge_default_arn
   lambda_config = {
     "comments": {
         function_name = "reddit-ingestion-comments",

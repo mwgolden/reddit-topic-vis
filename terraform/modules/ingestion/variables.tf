@@ -30,3 +30,7 @@ variable "api_token_cache_tables" {
     api_token_cache_table = string
   })
 }
+
+variable "eventbridge_default_arn" {
+  type = string
+}

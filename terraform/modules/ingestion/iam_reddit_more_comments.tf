@@ -4,7 +4,8 @@ data "aws_iam_policy_document" "reddit_download_more_comments_policy_combined" {
     data.aws_iam_policy_document.lambda_s3_policy.json,
     data.aws_iam_policy_document.sqs_consumer_policy.json,
     data.aws_iam_policy_document.dynamodb_read_policy.json,
-    data.aws_iam_policy_document.dynamodb_insert_policy.json
+    data.aws_iam_policy_document.dynamodb_insert_policy.json,
+    data.aws_iam_policy_document.publish_event.json
    ]
 }
 

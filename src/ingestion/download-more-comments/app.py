@@ -9,6 +9,18 @@ from api_token_cache.models import DynamoDbConfig
 ENDPOINT = os.environ.get('API_ENDPOINT')
 BUCKET = os.environ.get('S3_BUCKET')
 
+def emit_download_complete_event(event_payload):
+    # Will use the default event bus
+    event_bridge_client = boto3.client('events')
+    response = event_bridge_client.put_events(
+        Entries=[{
+            "DetailType": "Reddit Comment Download Complete",
+            "Source": "reddit.ingestion",
+            "Detail": json.dumps(event_payload)
+        }]
+    )
+    print(response)
+
 def save_to_bucket(json_object, key):    
     s3 = boto3.resource("s3")
     obj = s3.Object(BUCKET, key) # type: ignore
@@ -33,6 +45,7 @@ def lambda_handler(event, context):
         post_id = message['post_id']
         if message["status"] == "complete":
             print(f"download complete for post {post_id}")
+            emit_download_complete_event(message)
         else:
             bot_name = message['bot_name']
             s3_bucket = message['s3_bucket']
