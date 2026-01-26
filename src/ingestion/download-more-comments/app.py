@@ -15,6 +15,7 @@ logger.setLevel("INFO")
 
 event_bridge_client = boto3.client('events')
 s3 = boto3.resource("s3")
+s3_client = boto3.client('s3')
 
 def emit_download_complete_event(event_payload):
     # Will use the default event bus
@@ -35,7 +36,7 @@ def save_to_bucket(json_object, key):
     return response
 
 def get_from_bucket(bucket, key):
-    file_obj = s3.get_object(Bucket=bucket,Key=key) # type: ignore
+    file_obj = s3_client.get_object(Bucket=bucket,Key=key) # type: ignore
     fileData = file_obj['Body'].read()
     return json.loads(fileData)
 
