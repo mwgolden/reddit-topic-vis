@@ -6,10 +6,17 @@ import urllib3
 from api_token_cache import http_requests
 from api_token_cache.models import DynamoDbConfig
 import uuid
+import logging
 
 ENDPOINT = os.environ.get('API_ENDPOINT')
 BUCKET = os.environ.get('S3_BUCKET')
 QUEUE_URL = os.environ.get('QUEUE_URL')
+
+logger = logging.getLogger()
+logger.setLevel("INFO")
+
+s3 = boto3.resource("s3")
+sqs_client = boto3.client('sqs')
 
 def get_more_comment_ids(listings):
     more_comments_ids = []
@@ -23,20 +30,18 @@ def get_more_comment_ids(listings):
 
 
 def save_to_bucket(json_object, key):    
-    s3 = boto3.resource("s3")
     obj = s3.Object(BUCKET, key) # type: ignore
     response = obj.put(Body=json.dumps(json_object))
     return response
 
 
 def queue_more_comments(message, queue_url, message_group_id):
-    sqs_client = boto3.client('sqs')
     response = sqs_client.send_message(
         QueueUrl=queue_url,
         MessageBody=json.dumps(message),
         MessageGroupId=message_group_id
     )
-    print(response)
+    logger.info(response)
 
 def process_more_comments(comment_ids, post_id, more_comments_key, bot_name, queue_url, message_group_id):
     total_pages = math.ceil(len(comment_ids) / 100)
@@ -60,32 +65,36 @@ def process_more_comments(comment_ids, post_id, more_comments_key, bot_name, que
         queue_more_comments(msg, queue_url, message_group_id)
 
 def lambda_handler(event, context):
-    bot_name = event['bot_name']
-    post_id = event['post_id']  
-    url = f'{ENDPOINT}/{post_id}?threaded=False'
+    try:
+        bot_name = event['bot_name']
+        post_id = event['post_id']  
+        url = f'{ENDPOINT}/{post_id}?threaded=False'
 
-    db_config = DynamoDbConfig(api_config_table="api_bot_config", api_token_cache_table="api_token_cache")
-    http_pool = urllib3.PoolManager()
+        db_config = DynamoDbConfig(api_config_table="api_bot_config", api_token_cache_table="api_token_cache")
+        http_pool = urllib3.PoolManager()
 
-    listings = http_requests.http_oauth_client_credentials(url=url, bot_name=bot_name, db_config=db_config, http=http_pool)
+        listings = http_requests.http_oauth_client_credentials(url=url, bot_name=bot_name, db_config=db_config, http=http_pool)
 
 
-    bucket_key = f'raw/comments/{post_id}/0_{post_id}.json'
-    save_to_bucket(listings, bucket_key)
-    more_comments = get_more_comment_ids(listings)
-    if more_comments:
-        message_group_id = f"{post_id}.{uuid.uuid4()}"
-        more_comments_key = f'raw/comments_cache/{post_id}_more_comments.json'
-        save_to_bucket(more_comments, more_comments_key)
-        process_more_comments(more_comments, post_id, more_comments_key, bot_name, QUEUE_URL, message_group_id)
+        bucket_key = f'raw/comments/{post_id}/0_{post_id}.json'
+        save_to_bucket(listings, bucket_key)
+        more_comments = get_more_comment_ids(listings)
+        if more_comments:
+            message_group_id = f"{post_id}.{uuid.uuid4()}"
+            more_comments_key = f'raw/comments_cache/{post_id}_more_comments.json'
+            save_to_bucket(more_comments, more_comments_key)
+            process_more_comments(more_comments, post_id, more_comments_key, bot_name, QUEUE_URL, message_group_id)
 
-        completion_message = {
-            "bot_name": bot_name,
-            "post_id": post_id,
-            "status": "complete",
-            "queue_url": QUEUE_URL
-        }
-        queue_more_comments(completion_message, QUEUE_URL, message_group_id)
+            completion_message = {
+                "bot_name": bot_name,
+                "post_id": post_id,
+                "status": "complete",
+                "queue_url": QUEUE_URL
+            }
+            queue_more_comments(completion_message, QUEUE_URL, message_group_id)
+    except Exception:
+        logger.error("Error processing lambda event")
+        raise
 
     return {
         "statusCode": 200,
