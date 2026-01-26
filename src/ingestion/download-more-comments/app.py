@@ -59,7 +59,7 @@ def lambda_handler(event, context):
             url = f'{ENDPOINT}?link_id=t3_{post_id}&morechildren={",".join(next_comments).replace(",","%2C")}&api_type=json'
             listings = http_requests.http_oauth_client_credentials(url=url, bot_name=bot_name, db_config=db_config, http=http_pool)
             res = save_to_bucket(json_object=listings, key=f'raw/comments/{post_id}/{page}_{post_id}.json')
-        return {
+    return {
         "statusCode": 200,
         "body": ''
     }
