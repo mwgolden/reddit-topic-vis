@@ -23,7 +23,7 @@ module "ingestion" {
         lambda_handler = "app.lambda_handler",
         runtime = "python3.12",
         environment_variables = {
-            "API_ENDPOINT": "https://oauth.reddit.com/comments",
+            "API_ENDPOINT": "https://oauth.reddit.com/api/morechildren",
             "S3_BUCKET": aws_s3_bucket.com_wgolden_reddit.id
         }
     }

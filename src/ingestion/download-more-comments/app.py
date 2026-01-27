@@ -27,7 +27,6 @@ def emit_download_complete_event(event_payload):
             "Detail": json.dumps(event_payload)
         }]
     )
-    logger.info("Completion event emitted")
     logger.info(response)
 
 def save_to_bucket(json_object, key):    
@@ -43,6 +42,9 @@ def get_from_bucket(bucket, key):
 
 def lambda_handler(event, context):
 
+    logger.info("## Event Object ##")
+    logger.info(event)
+
     db_config = DynamoDbConfig(api_config_table="api_bot_config", api_token_cache_table="api_token_cache")
     http_pool = urllib3.PoolManager()
 
@@ -53,6 +55,7 @@ def lambda_handler(event, context):
             post_id = message['post_id']
             if message["status"] == "complete":
                 logger.info(f"download complete for post {post_id}")
+                logger.info(f"emit complete message: {message}")
                 emit_download_complete_event(message)
             else:
                 bot_name = message['bot_name']
@@ -64,7 +67,7 @@ def lambda_handler(event, context):
                 page = message['page']
                 comment_ids = get_from_bucket(s3_bucket, bucket_key)
                 next_comments = comment_ids[start:stop]
-                url = f'{ENDPOINT}?link_id=t3_{post_id}&morechildren={",".join(next_comments).replace(",","%2C")}&api_type=json'
+                url = f'{ENDPOINT}?link_id=t3_{post_id}&children={",".join(next_comments)}&api_type=json'
                 listings = http_requests.http_oauth_client_credentials(url=url, bot_name=bot_name, db_config=db_config, http=http_pool)
                 res = save_to_bucket(json_object=listings, key=f'raw/comments/{post_id}/{page}_{post_id}.json')
         except Exception:
