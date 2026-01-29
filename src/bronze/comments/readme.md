@@ -1,0 +1,1 @@
+Split records into tables for posts and comments
