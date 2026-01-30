@@ -4,3 +4,8 @@ variable "api_token_cache_tables" {
     api_token_cache_table = string
   })
 }
+
+variable "data_bucket_name" {
+  type = string
+  description = "Name of top level bucket for reddit data"
+}
