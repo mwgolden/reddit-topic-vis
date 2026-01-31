@@ -1,4 +1,16 @@
 
+variable "account_id" {
+  type = string
+}
+
+variable "region" {
+  type = string
+}
+
+variable "data_bucket_name" {
+  type = string
+}
+
 variable "lambda_config" {
   type = map(object({
     function_name = string
@@ -19,30 +31,23 @@ variable "lambda_config" {
   }
 }
 
-variable "account_id" {
-  type = string
+variable "data_catalog" {
+  type = object({
+    database_name = string
+    tables = object({
+      posts_table = string
+      comments_table = string
+    })
+    
+  })
 }
 
-variable "region" {
-  type = string
-}
-
-variable "data_bucket_name" {
-  type = string
-}
-
-variable "eventbridge_default_arn" {
-  type = string
-}
-
-variable "database_name" {
-  type = string
-}
-
-variable "posts_table" {
-  type = string
-}
-
-variable "comments_table" {
-  type = string
+variable "event_source_config" {
+  type = object({
+    eventbridge_default_arn = string
+    events = object({
+      name = string
+      arn = string
+    })
+  })
 }

@@ -1,3 +1,4 @@
+import os
 import json
 import boto3
 import pandas as pd
@@ -55,7 +56,7 @@ DATABASE = "reddit.bronze"
 TABLE = "comments"
 
 def lambda_handler(event, context):
-
+    logger.info(event)
     event_detail = event.get("detail", {})
     if not event_detail:
         logger.warning("Detail object is empty")

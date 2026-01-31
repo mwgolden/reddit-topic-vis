@@ -1,12 +1,12 @@
 data "aws_iam_policy_document" "reddit_bronze_layer_policy" {
   source_policy_documents = [ 
-    aws_iam_policy_document.lambda_logs_policy.json,
-    aws_iam_policy_document.s3_read.json,
-    aws_iam_policy_document.s3_write.json,
-    aws_iam_policy_document.glue_catalog.json,
-    aws_iam_policy_document.glue_database.json,
-    aws_iam_policy_document.glue_tables.json,
-    aws_iam_policy_document.glue_partitions.json
+    data.aws_iam_policy_document.lambda_logs_policy.json,
+    data.aws_iam_policy_document.s3_read.json,
+    data.aws_iam_policy_document.s3_write.json,
+    data.aws_iam_policy_document.glue_catalog.json,
+    data.aws_iam_policy_document.glue_database.json,
+    data.aws_iam_policy_document.glue_tables.json,
+    data.aws_iam_policy_document.glue_partitions.json
    ]
 }
 

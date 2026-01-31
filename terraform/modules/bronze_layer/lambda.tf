@@ -24,3 +24,20 @@ resource "aws_lambda_function" "this" {
     variables = each.value.environment_variables
   }
 }
+
+resource "aws_cloudwatch_event_target" "this" {
+  for_each = aws_lambda_function.this
+  rule = var.event_source_config.events.name
+  target_id = each.key
+  arn = each.value.arn
+}
+
+resource "aws_lambda_permission" "eventbridge" {
+  for_each = aws_lambda_function.this
+
+  statement_id = "AllowEventBridgeInvoke-bronze-${each.key}"
+  action = "lambda:InvokeFunction"
+  function_name = each.value.function_name
+  principal = "events.amazonaws.com"
+  source_arn = var.event_source_config.events.arn
+}

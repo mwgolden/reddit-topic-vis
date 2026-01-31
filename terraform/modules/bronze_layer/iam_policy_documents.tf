@@ -77,7 +77,7 @@ data "aws_iam_policy_document" "glue_database" {
         "glue:GetSchema",
         "glue:GetSchemaVersion"
      ]
-     resources = [ "arn:aws:glue:${var.region}:${var.account_id}:database/${var.database_name}"]
+     resources = [ "arn:aws:glue:${var.region}:${var.account_id}:database/${var.data_catalog.database_name}"]
   }
 }
 
@@ -92,8 +92,8 @@ data "aws_iam_policy_document" "glue_tables" {
         "glue:DeleteTable"
      ]
      resources = [ 
-        "arn:aws:glue:${var.region}:${var.account_id}:table/${var.database_name}/${var.posts_table}",
-        "arn:aws:glue:${var.region}:${var.account_id}:table/${var.database_name}/${var.comments_table}"
+        "arn:aws:glue:${var.region}:${var.account_id}:table/${var.data_catalog.database_name}/${var.data_catalog.tables.posts_table}",
+        "arn:aws:glue:${var.region}:${var.account_id}:table/${var.data_catalog.database_name}/${var.data_catalog.tables.comments_table}"
         ]
   }
 }
@@ -110,8 +110,8 @@ data "aws_iam_policy_document" "glue_partitions" {
         "glue:BatchDeletePartition"
      ]
      resources = [ 
-        "arn:aws:glue:${var.region}:${var.account_id}:table/${var.database_name}/${var.posts_table}",
-        "arn:aws:glue:${var.region}:${var.account_id}:table/${var.database_name}/${var.comments_table}"
+        "arn:aws:glue:${var.region}:${var.account_id}:table/${var.data_catalog.database_name}/${var.data_catalog.tables.posts_table}",
+        "arn:aws:glue:${var.region}:${var.account_id}:table/${var.data_catalog.database_name}/${var.data_catalog.tables.comments_table}"
         ]
   }
 }
