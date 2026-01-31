@@ -94,7 +94,8 @@ def lambda_handler(event, context):
             database=DATABASE,
             table=TABLE,
             mode="overwrite_partitions",
-            dtype={"data": "string"}
+            dtype={"data": "string"},
+            use_threads=False
         )
     
     return {

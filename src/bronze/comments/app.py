@@ -78,7 +78,7 @@ def lambda_handler(event, context):
         logger.info(f"Processed {len(comments)} from first comments file")
         object_prefixes.pop(0)
         more_comments = get_more_comments(bucket=BUCKET, prefixes=object_prefixes)
-        logger.info(f"Processed {len(more_comments)} from first more_comments files")
+        logger.info(f"Processed {len(more_comments)} from more_comments files")
         comments.extend(more_comments)
 
         run_date = datetime.now(timezone.utc)
@@ -110,7 +110,8 @@ def lambda_handler(event, context):
             database=DATABASE,
             table=TABLE,
             mode="overwrite_partitions",
-            dtype={"data": "string"}
+            dtype={"data": "string"},
+            use_threads=False
         )
     
     return {

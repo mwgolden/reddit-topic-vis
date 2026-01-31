@@ -16,9 +16,11 @@ resource "aws_lambda_function" "this" {
   filename = data.archive_file.lambda[each.key].output_path
   source_code_hash = data.archive_file.lambda[each.key].output_base64sha256
 
-  timeout = 60
+  timeout = 120
+  memory_size = 2048
   
   role = aws_iam_role.reddit_lambda_bronze_layer_role.arn
+  layers = [ "arn:aws:lambda:us-east-1:336392948345:layer:AWSSDKPandas-Python312:21" ]
   
   environment {
     variables = each.value.environment_variables
