@@ -69,6 +69,7 @@ def lambda_handler(event, context):
         timestamp_str = run_date.strftime("%Y-%m-%d %H:%M:%S")
         hive_partition_date_str = run_date.strftime("%Y-%m-%d")
         df = pd.DataFrame(data=post)
+        df["data"] = df["data"].apply(lambda x: json.dumps(x))
         df["post_id"] = post_id
         df["run_date"] = timestamp_str
         df["hive_partition_date"] = hive_partition_date_str
