@@ -106,8 +106,6 @@ def lambda_handler(event, context):
             list(comments_normalized.columns)
         )
 
-        print(comments_normalized)
-
         logger.info("### Write to data catalog ###")
         
         wr.catalog.create_database(
