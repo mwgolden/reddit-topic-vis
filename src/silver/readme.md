@@ -1,0 +1,1 @@
+Transform semi-structured data into tabular, consistent shape.

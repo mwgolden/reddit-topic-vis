@@ -1,0 +1,137 @@
+table: posts
+
+columns:
+  # pipeline metadata
+  post_id: string
+  ingested_at: timestamp
+  normalized_at: timestamp
+  hive_partition_date: date
+
+  # identifiers
+  id: string
+  name: string
+  subreddit_id: string
+  subreddit: string
+  subreddit_name_prefixed: string
+  subreddit_type: string
+  permalink: string
+  url: string
+  url_overridden_by_dest: string
+  domain: string
+
+  # authors
+  author: string
+  author_fullname: string
+  author_is_blocked: string
+  author_premium: string
+  author_patreon_flair: string
+  author_flair_type: string
+  author_flair_text: string
+  author_flair_text_color: string
+  author_flair_background_color: string
+  author_flair_css_class: string
+  author_flair_template_id: string
+  author_flair_richtext: string
+
+  # timestamps (epoch seconds)
+  created: bigint
+  created_utc: bigint
+  approved_at_utc: bigint
+  banned_at_utc: bigint
+
+  # content
+  title: string
+  selftext: string
+  selftext_html: string
+  thumbnail: string
+  thumbnail_height: int
+  thumbnail_width: int
+  media_only: string
+  media_metadata: string
+  media: string
+  media_embed: string
+  secure_media: string
+  secure_media_embed: string
+  gallery_data: string
+  is_gallery: string
+  is_video: string
+  is_self: string
+  is_original_content: string
+  is_reddit_media_domain: string
+  is_meta: string
+
+  # moderation / state
+  approved_by: string
+  banned_by: string
+  mod_reason_by: string
+  mod_reason_title: string
+  mod_note: string
+  removal_reason: string
+  removed_by: string
+  removed_by_category: string
+  distinguished: string
+  quarantine: string
+  archived: string
+  locked: string
+  contest_mode: string
+  pinned: string
+  stickied: string
+  spoiler: string
+  over_18: string
+  hidden: string
+  no_follow: string
+  can_mod_post: string
+  can_gild: string
+  allow_live_comments: string
+  send_replies: string
+  visited: string
+  clicked: string
+  hide_score: string
+  edited: string
+  is_robot_indexable: string
+  is_crosspostable: string
+  is_created_from_ads_ui: string
+
+  # flair
+  link_flair_type: string
+  link_flair_text: string
+  link_flair_text_color: string
+  link_flair_background_color: string
+  link_flair_css_class: string
+  link_flair_richtext: string
+
+  # engagement / counts
+  ups: int
+  downs: int
+  score: int
+  upvote_ratio: double
+  gilded: int
+  total_awards_received: int
+  num_comments: int
+  num_crossposts: int
+  num_duplicates: int
+  num_reports: int
+  view_count: int
+  subreddit_subscribers: int
+  controversiality: int
+  pwls: int
+  wls: int
+
+  # awards / reports (json blobs)
+  all_awardings: string
+  awarders: string
+  gildings: string
+  user_reports: string
+  report_reasons: string
+  mod_reports: string
+  associated_award: string
+  top_awarded_type: string
+  content_categories: string
+  treatment_tags: string
+
+  # misc
+  likes: string
+  suggested_sort: string
+  discussion_type: string
+  category: string
+  extra_columns: string

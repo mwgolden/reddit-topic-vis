@@ -2,6 +2,9 @@ table: comments
 
 columns:
   post_id: string
+  ingested_at: timestamp
+  normalized_at: timestamp
+  hive_partition_date: date
   id: string
   name: string
   parent_id: string
