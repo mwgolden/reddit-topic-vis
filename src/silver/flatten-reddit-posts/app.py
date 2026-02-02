@@ -88,6 +88,11 @@ def lambda_handler(event, context):
         posts_normalized["extra_columns"] = posts_normalized[list(extra_columns)].to_dict(orient="records")
         posts_normalized = posts_normalized.reindex(columns=columns)
 
+        # save media_metadata as proper json string
+        posts_normalized["media_metadata"] = posts_normalized["media_metadata"].apply(
+            lambda x: json.dumps(x) if isinstance(x, (dict, list)) else None
+        )
+
         posts_normalized = posts_normalized.assign(
             post_id=posts_df["post_id"].values,
             ingested_at=posts_df["run_date"].values,

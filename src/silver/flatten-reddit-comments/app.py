@@ -89,7 +89,7 @@ def lambda_handler(event, context):
         extra_columns = set(comments_normalized.columns) - set(columns)
         comments_normalized["extra_columns"] = comments_normalized[list(extra_columns)].to_dict(orient="records")
         comments_normalized = comments_normalized.reindex(columns=columns)
-        # save media_metadata as preper json string
+        # save media_metadata as proper json string
         comments_normalized["media_metadata"] = comments_normalized["media_metadata"].apply(
             lambda x: json.dumps(x) if isinstance(x, (dict, list)) else None
         )
