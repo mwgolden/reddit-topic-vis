@@ -12,6 +12,21 @@ logger = logging.getLogger()
 logger.setLevel("INFO")
 
 s3_client = boto3.client("s3")
+event_bridge_client = boto3.client('events')
+
+def emit_download_complete_event(event_payload):
+    # Will use the default event bus
+    
+    response = event_bridge_client.put_events(
+        Entries=[{
+            "DetailType": "Reddit Comments Bronze Load Complete",
+            "Source": "reddit.bronze",
+            "Table": "comments",
+            "Detail": json.dumps(event_payload)
+        }]
+    )
+    logger.info(response)
+
 
 
 def sort_keys(file_keys: List[str]) -> List[str]:
@@ -114,6 +129,8 @@ def lambda_handler(event, context):
             dtype={"data": "string"},
             use_threads=False
         )
+
+        emit_download_complete_event({"post_id": post_id, "run_date": timestamp_str})
     
     return {
         "statusCode": 200,
