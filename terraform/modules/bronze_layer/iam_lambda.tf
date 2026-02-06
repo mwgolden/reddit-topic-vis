@@ -6,7 +6,8 @@ data "aws_iam_policy_document" "reddit_bronze_layer_policy" {
     data.aws_iam_policy_document.glue_database.json,
     data.aws_iam_policy_document.glue_catalog.json,
     data.aws_iam_policy_document.glue_tables.json,
-    data.aws_iam_policy_document.glue_partitions.json
+    data.aws_iam_policy_document.glue_partitions.json,
+    data.aws_iam_policy_document.publish_eventbridge_event.json
    ]
 }
 

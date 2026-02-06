@@ -68,5 +68,36 @@ module "bronze_layer" {
         }
     }
   }
+}
 
+module "silver_layer" {
+  source = "./modules/silver_layer"
+  region = local.region
+  account_id = local.account_id
+  data_bucket_name = var.data_bucket_name
+  event_source_config = {
+    eventbridge_default_arn = local.eventbridge_default_arn
+    comment_load_event = module.bronze_layer.bronze_comments_load_event
+    post_load_event = module.bronze_layer.bronze_posts_load_event
+  }
+  lambda_config = {
+    "posts": {
+      function_name = "reddit-silver-posts"
+      archive_src_path = "../src/silver/flatten-reddit-posts"
+      archive_build_path = "../build/flatten-reddit-posts.zip"
+      lambda_handler = "app.lambda_handler"
+      runtime = "python3.12"
+      layers = [aws_lambda_layer_version.project_dependencies.arn, "arn:aws:lambda:us-east-1:336392948345:layer:AWSSDKPandas-Python312:21"]
+      environment_variables = {}
+    }
+    "comments": {
+      function_name = "reddit-silver-comments"
+      archive_src_path = "../src/silver/flatten-reddit-comments"
+      archive_build_path = "../build/flatten-reddit-comments.zip"
+      lambda_handler = "app.lambda_handler"
+      runtime = "python3.12"
+      layers = [aws_lambda_layer_version.project_dependencies.arn, "arn:aws:lambda:us-east-1:336392948345:layer:AWSSDKPandas-Python312:21"]
+      environment_variables = {}
+    }
+  }
 }

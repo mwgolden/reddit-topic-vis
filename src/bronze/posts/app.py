@@ -21,7 +21,6 @@ def emit_download_complete_event(event_payload):
         Entries=[{
             "DetailType": "Reddit Posts Bronze Load Complete",
             "Source": "reddit.bronze",
-            "Table": "posts",
             "Detail": json.dumps(event_payload)
         }]
     )
@@ -113,7 +112,7 @@ def lambda_handler(event, context):
             use_threads=False
         )
 
-        emit_download_complete_event({"post_id": post_id, "run_date": timestamp_str})
+        emit_download_complete_event({"post_id": post_id, "table": "posts", "run_date": timestamp_str})
     
     return {
         "statusCode": 200,

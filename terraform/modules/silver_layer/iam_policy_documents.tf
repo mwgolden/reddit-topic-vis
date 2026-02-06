@@ -27,10 +27,16 @@ data "aws_iam_policy_document" "s3_read" {
     effect = "Allow"
     actions = [
         "s3:ListBucket",
-        "s3:GetObject"
+        "s3:GetBucketLocation"
      ]
      
-     resources = [ "${data.aws_s3_bucket.reddit_bucket.arn}", "${data.aws_s3_bucket.reddit_bucket.arn}/raw/*", "${data.aws_s3_bucket.reddit_bucket.arn}/bronze/*" ]
+     resources = [ "${data.aws_s3_bucket.reddit_bucket.arn}" ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [ "s3:GetObject" ]
+    resources = [  "${data.aws_s3_bucket.reddit_bucket.arn}/bronze/*", "${data.aws_s3_bucket.reddit_bucket.arn}/silver/*" ]
   }
 }
 
@@ -44,7 +50,7 @@ data "aws_iam_policy_document" "s3_write" {
         "s3:ListMultipartUploadParts"
 
      ]
-     resources = [ "${data.aws_s3_bucket.reddit_bucket.arn}/bronze/*" ]
+     resources = [ "${data.aws_s3_bucket.reddit_bucket.arn}/silver/*" ]
   }
 
 
@@ -69,7 +75,10 @@ data "aws_iam_policy_document" "glue_catalog" {
         "glue:GetTable",
         "glue:GetTables",
      ]
-     resources = [ "arn:aws:glue:${var.region}:${var.account_id}:catalog", "arn:aws:glue:${var.region}:${var.account_id}:database/${var.data_catalog.database_name}" ]
+     resources = [ 
+      "arn:aws:glue:${var.region}:${var.account_id}:catalog", 
+      "arn:aws:glue:${var.region}:${var.account_id}:database/*"
+      ]
   }
 }
 
@@ -86,9 +95,9 @@ data "aws_iam_policy_document" "glue_tables" {
         "glue:GetTableVersions"
      ]
      resources = [ 
-        "arn:aws:glue:${var.region}:${var.account_id}:table/${var.data_catalog.database_name}",
-        "arn:aws:glue:${var.region}:${var.account_id}:table/${var.data_catalog.database_name}/comments",
-        "arn:aws:glue:${var.region}:${var.account_id}:table/${var.data_catalog.database_name}/posts"
+        "arn:aws:glue:${var.region}:${var.account_id}:table/*/*",
+        "arn:aws:glue:${var.region}:${var.account_id}:database/*",
+        "arn:aws:glue:${var.region}:${var.account_id}:catalog"
         ]
   }
 }
@@ -106,20 +115,17 @@ data "aws_iam_policy_document" "glue_partitions" {
         "glue:UpdatePartition"
      ]
      resources = [ 
-        "arn:aws:glue:${var.region}:${var.account_id}:database/${var.data_catalog.database_name}",
-        "arn:aws:glue:${var.region}:${var.account_id}:table/${var.data_catalog.database_name}/comments",
-        "arn:aws:glue:${var.region}:${var.account_id}:table/${var.data_catalog.database_name}/posts",
+        "arn:aws:glue:${var.region}:${var.account_id}:database/*",
+        "arn:aws:glue:${var.region}:${var.account_id}:table/*/*",
         "arn:aws:glue:${var.region}:${var.account_id}:catalog"
         ]
   }
 }
 
-data "aws_iam_policy_document" "publish_eventbridge_event" {
+data "aws_iam_policy_document" "athena" {
   statement {
     effect = "Allow"
-    actions = [ 
-      "events:PutEvents"
-     ]
-     resources = [ "*" ]
+    actions = [ "athena:*" ]
+    resources = [ "arn:aws:athena:${var.region}:${var.account_id}:workgroup/*" ]
   }
 }

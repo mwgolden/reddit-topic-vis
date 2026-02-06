@@ -17,14 +17,14 @@ sql = """
         SELECT
             post_id,
             max(hive_partition_date) AS most_recent_download
-        FROM posts
+        FROM "reddit.bronze".posts
         GROUP BY post_id
     )
     SELECT
         c.post_id,
         c.run_date,
         c.data
-    FROM posts c
+    FROM "reddit.bronze".posts c
     JOIN latest l
     ON c.post_id = l.post_id
     AND c.hive_partition_date = l.most_recent_download
@@ -32,10 +32,9 @@ sql = """
 """
 
 OUTPUT_PATH = "s3://com.wgolden.reddit/silver/posts"
-READ_DATABASE = "reddit.bronze"
 READ_TABLE = "posts"
 
-WRITE_DATABASE = "reddit.silver"
+DATABASE = "reddit.silver"
 POSTS_TABLE = "posts"
 
 BASE_DIR = Path(__file__).parent
@@ -67,9 +66,10 @@ def lambda_handler(event, context):
         
         posts_df = wr.athena.read_sql_query(
             sql=sql,
-            database=READ_DATABASE,
+            database=DATABASE,
             paramstyle="qmark",
-            params=[post_id]
+            params=[post_id],
+            s3_output="s3://com.wgolden.reddit/silver/temp"
         )
 
         posts_df["data_json"] = posts_df["data"].map(json.loads)
@@ -109,7 +109,7 @@ def lambda_handler(event, context):
         logger.info("### Write to data catalog ###")
         
         wr.catalog.create_database(
-            name=WRITE_DATABASE, 
+            name=DATABASE, 
             description="reddit data silver layer",
             exist_ok=True
         )
@@ -120,7 +120,7 @@ def lambda_handler(event, context):
             dataset=True,
             path=OUTPUT_PATH,
             partition_cols=["hive_partition_date", "post_id"],
-            database=WRITE_DATABASE,
+            database=DATABASE,
             table=POSTS_TABLE,
             mode="overwrite_partitions",
             dtype=schema,
