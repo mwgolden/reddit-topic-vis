@@ -15,6 +15,7 @@ with recursive comment_tree(
     post_id
     ,comment_id
     ,parent_id
+    ,author
     ,comment
     ,path
     ,depth
@@ -24,6 +25,7 @@ with recursive comment_tree(
         post_id
         ,concat('t1_', id) AS comment_id
         ,parent_id
+        ,author
         ,body AS comment
         ,array[concat('t1_', id)] AS path
         ,1 AS depth
@@ -43,7 +45,8 @@ with recursive comment_tree(
         ,concat('t1_', c.id) AS comment_id
         ,c.parent_id
         ,c.body AS comment
-        ,concat(t.path, array[concat('t1_', c.id)]) AS path
+        ,c.author
+        ,t.path || array[concat('t1_', c.id)] AS path
         ,t.depth + 1 AS depth
         ,t.normalized_at
     FROM comment_tree t
@@ -62,7 +65,8 @@ select
     ,parent_id
     ,comment_id
     ,depth
-    ,path
+    ,CONCAT('[', array_join(transform(path, x -> CONCAT('"', x, '"')), ','), ']') AS path
+    ,author
     ,comment
     ,normalized_at
 from comment_tree
