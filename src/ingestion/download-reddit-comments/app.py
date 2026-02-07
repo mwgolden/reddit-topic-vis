@@ -79,19 +79,20 @@ def lambda_handler(event, context):
         bucket_key = f'raw/comments/{post_id}/0_{post_id}.json'
         save_to_bucket(listings, bucket_key)
         more_comments = get_more_comment_ids(listings)
+        message_group_id = f"{post_id}.{uuid.uuid4()}"
         if more_comments:
-            message_group_id = f"{post_id}.{uuid.uuid4()}"
             more_comments_key = f'raw/comments_cache/{post_id}_more_comments.json'
             save_to_bucket(more_comments, more_comments_key)
             process_more_comments(more_comments, post_id, more_comments_key, bot_name, QUEUE_URL, message_group_id)
 
-            completion_message = {
-                "bot_name": bot_name,
-                "post_id": post_id,
-                "status": "complete",
-                "queue_url": QUEUE_URL
-            }
-            queue_more_comments(completion_message, QUEUE_URL, message_group_id)
+        completion_message = {
+            "bot_name": bot_name,
+            "post_id": post_id,
+            "status": "complete",
+            "queue_url": QUEUE_URL
+        }
+        queue_more_comments(completion_message, QUEUE_URL, message_group_id)
+    
     except Exception:
         logger.error("Error processing lambda event")
         raise
