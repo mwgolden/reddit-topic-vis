@@ -44,8 +44,8 @@ with recursive comment_tree(
         t.post_id
         ,concat('t1_', c.id) AS comment_id
         ,c.parent_id
-        ,c.body AS comment
         ,c.author
+        ,c.body AS comment
         ,t.path || array[concat('t1_', c.id)] AS path
         ,t.depth + 1 AS depth
         ,t.normalized_at
