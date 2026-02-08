@@ -138,7 +138,7 @@ if __name__ == "__main__":
         "time": "2026-01-30T15:04:05Z",
         "region": "us-east-1",
         "resources": [],
-        "detail": {"bot_name": "reddit_bot", "post_id": "1qy99ca"}
+        "detail": {"bot_name": "reddit_bot", "post_id": "1qxc496"}
     }
 
     lambda_handler(event=event, context=None)

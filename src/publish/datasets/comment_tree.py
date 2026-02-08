@@ -4,7 +4,6 @@ import awswrangler as wr
 import pandas as pd
 from typing import Dict
 
-
 logger = logging.getLogger()
 logger. setLevel("INFO")
 
@@ -37,45 +36,15 @@ def build_comment_tree(df: pd.DataFrame) -> Dict:
                 parent = node
     return tree
 
-def lambda_handler(event, context):
-    logger.info(f"Event: {event}")
-    event_detail = event.get("detail", {})
-    if not event_detail:
-        logger.warning("Detail object is empty")
-        logger.warning("## Event Object ##")
-        logger.warning(event_detail)
-    else:
-        post_id = event_detail.get("post_id", None)
-        df = wr.athena.read_sql_query(
-            sql=SQL,
-            database="reddit.gold",
-            paramstyle="qmark",
-
-            params=[post_id],
-            s3_output="s3://com.wgolden.reddit/gold/temp"
-        )
-        
-        comment_tree = build_comment_tree(df)
-
-        with open("reddit_comment_tree.json", "w") as f:
-            json.dump(comment_tree, f, indent=2)
-
-
-
-
-
-if __name__ == "__main__":
-
-    event = {
-        "version": "0",
-        "id": "a1b2c3d4-5678-90ab-cdef-EXAMPLE11111",
-        "detail-type": "MyCustomEvent",
-        "source": "my.app",
-        "account": "123456789012",
-        "time": "2026-01-30T15:04:05Z",
-        "region": "us-east-1",
-        "resources": [],
-        "detail": {"bot_name": "reddit_bot", "post_id": "1qxc496"}
-    }
-
-    lambda_handler(event=event, context=None)
+def publish_comment_tree(post_id: str) -> Dict:
+    logger.info(f"Build comment tree for {post_id}")
+    df = wr.athena.read_sql_query(
+        sql=SQL,
+        database="reddit.gold",
+        paramstyle="qmark",
+        params=[post_id],
+        s3_output="s3://com.wgolden.reddit/gold/temp"
+    )
+    
+    comment_tree = build_comment_tree(df)
+    return comment_tree
