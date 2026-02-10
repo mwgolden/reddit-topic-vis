@@ -24,14 +24,14 @@ def build_comment_tree(df: pd.DataFrame) -> Dict:
                 # check if already exists
                 node = next((c for c in parent_children if c["name"] == cid), None)
                 if not node:
-                    node = {"name": cid, "body": row["comment"], "author": row["author"], "children": []}
+                    node = {"name": cid, "body": row["comment"], "author": row["author"], "score": row["score"], "children": []}
                     parent_children.append(node)
                 parent = node
             else: 
                 parent_children = parent["children"]
                 node = next((c for c in parent_children if c["name"] == cid), None)
                 if not node: 
-                    node = {"name": cid, "body": row["comment"], "author": row["author"], "children": []}
+                    node = {"name": cid, "body": row["comment"], "author": row["author"], "score": row["score"], "children": []}
                     parent_children.append(node)
                 parent = node
     return tree
