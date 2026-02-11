@@ -9,23 +9,222 @@
         .link { fill: none; stroke: #64748b; stroke-opacity: 0.4; }
         .node circle { fill: #38bdf8; }
         .node text { font-size: 10px; fill: #e2e8f0; }
-        svg { display:block; margin:auto; width:100%; height:100%; }
+         /*svg { display:block; margin:auto; width:100%; height:100%; } */
+
+        #layout {
+        display: flex;
+        height: 100vh;
+        }
+
+        #sidebar {
+        width: 240px;
+        background: #020617;
+        border-right: 1px solid #1e293b;
+        padding: 16px;
+        }
+
+        #chart {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        }
+
+        svg {
+        width: 98vmin;
+        height: 98vmin;
+        }
+
+        .bucket {
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: 0.2s;
+        }
+
+        .bucket:hover {
+        background: #1e293b;
+        }
+
+        .bucket.active {
+        background: #38bdf8;
+        color: black;
+        font-weight: bold;
+        }
+
     </style>
 </head>
 <body>
     <h2 style="text-align:center">Reddit Comment Radial Tree</h2>
-    <svg width="1800" height="1800"></svg>
+    <div id="layout">
+        <div id="sidebar">
+            <h3>Comment Buckets</h3>
+            <div id="bucketList">
+
+            </div>
+        </div>
+        <div id="chart">
+            <svg width="1800" height="1800"></svg>
+        </div>
+    </div>
     <script type="module">
         import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm"
 
         /*
             Node spacing problems...
 
+            * Filter comment trees for most interesting conversations
+                - Compute subtree size per root
+                - Keep top 25–50 root comments
+                - Group the rest into “Other”
+                - Build radial tree from that filtered dataset
             * Angular width proportional to subtree size
+                - Compute leaf count for each node
+                - Assign angular spans
+                - Map angles to d3 tree radial coordinates
             * Depth spacing scaled with max depth
             * Force-collide adjustment for really dense nodes
             * Collapse deep threads by default
         */
+
+        // Assign angular spans
+        function assignAngle(node, startAngle, endAngle) {
+            node.startAngle = startAngle
+            node.endAngle = endAngle
+            node.angle = (startAngle + endAngle) / 2
+
+            if (node.children) {
+                let currentAngle = startAngle
+                node.children.forEach(child => {
+                    const span = (child.value / node.value) * (endAngle - startAngle)
+                    assignAngle(child, currentAngle, currentAngle + span)
+                    currentAngle += span
+                })
+            }
+        }
+        
+        // Map angles to d3 tree radial coordinates
+        function radialPoint(node) {
+            return [
+                node.y * Math.cos(node.angle - Math.PI / 2),
+                node.y * Math.sin(node.angle - Math.PI / 2)
+            ]
+        }
+
+        function quantile(sortedArray, qtile) {
+            const pos = (sortedArray.length - 1) * qtile
+            const base = Math.floor(pos)
+            const rest = pos - base
+
+            if (sortedArray[base + 1] !== undefined ) {
+                return sortedArray[base] + rest * (sortedArray[base + 1] - sortedArray[base])
+            } else {
+                return sortedArray[base]
+            }
+        }
+
+        function mapCommentsToBuckets(root) {
+            /*
+                Map comments to Quantiles based on comment score
+                Buckets: 
+                    - Top 20%
+                    - 60 - 80%
+                    - 40 - 60%
+                    - 20 - 40%
+                    - Bottom 20% 
+            */
+
+            const firstLevelComments = root.children || []
+            console.log(firstLevelComments)
+            console.log(`Root comment count: ${firstLevelComments.length}`)
+            const sortedComments = [ ...firstLevelComments ].sort(
+                (a, b) => (b.data.score || 0) - (a.data.score || 0)
+            )
+            
+            console.log(`Sorted comments: ${sortedComments}`)
+
+            // Cacluclate bucket sizes
+            const NUM_BUCKETS = 25
+            //const thresholds = []
+            
+            // Comment scores tend to skew left. Will distribute comments evenly between buckets to avoid empty buckets
+            const numComments = sortedComments.length
+            const bucketSize = Math.ceil(numComments / NUM_BUCKETS)
+
+            const buckets = []
+
+            for (let i = 0; i < NUM_BUCKETS; i++) {
+                const start = i * bucketSize
+                const end = start + bucketSize
+
+                const bucketRoots = sortedComments.slice(start, end)
+
+                buckets.push({
+                    index: i, 
+                    roots: bucketRoots, 
+                    count: bucketRoots.length
+
+                })
+            }
+
+            console.log(buckets)
+            return buckets
+
+        }
+
+        function mapCommentsToBucketsWithSkew(root, bucketPercentages) {
+
+            const firstLevelComments = root.children || [];
+
+            const sortedComments = [...firstLevelComments].sort(
+                (a, b) => (b.data.score || 0) - (a.data.score || 0)
+            );
+
+            const numComments = sortedComments.length;
+            const buckets = [];
+
+            let cursor = 0;
+
+            for (let i = 0; i < bucketPercentages.length; i++) {
+
+                let end;
+
+                // Last bucket takes the remainder to avoid rounding issues
+                if (i === bucketPercentages.length - 1) {
+                    end = numComments;
+                } else {
+                    end = cursor + Math.round(numComments * bucketPercentages[i]);
+                }
+
+                const bucketRoots = sortedComments.slice(cursor, end);
+
+                buckets.push({
+                    index: i,
+                    roots: bucketRoots,
+                    count: bucketRoots.length,
+                    pct: bucketPercentages[i]
+                });
+
+                cursor = end;
+            }
+
+            return buckets;
+        }
+
+
+        function bucketLabel(bucketIndex, bucketPercentages) {
+            //const pctStart = Math.round((bucketIndex / numBuckets) * 100)
+            //const pctEnd = Math.round(((bucketIndex + 1) / numBuckets) * 100)
+
+            if (bucketIndex === 0) return `Top ${Math.ceil(bucketPercentages[bucketIndex] * 100)}%`
+            if (bucketIndex === bucketPercentages.length - 1) return `Bottom ${Math.ceil(bucketPercentages[bucketIndex] * 100)}%`
+
+            return `${Math.ceil(bucketPercentages[bucketIndex] * 100)}% - ${Math.ceil(bucketPercentages[bucketIndex + 1] * 100)}%`
+        }
+
 
         d3.json("1qxc496_comment_tree.json").then(data => {
             const width = 900;
@@ -33,55 +232,106 @@
 
 
             const tree = d3.tree().size([2 * Math.PI, radius - 120]);
-            const root = d3.hierarchy(data);
-            tree(root);
+            const root = d3.hierarchy(data)
+
+            const bucketPercentages = [0.01, 0.03, 0.07, 0.14, 0.25, 0.50] // percent of comments after ordering by score
+
+            const buckets = mapCommentsToBucketsWithSkew(root, bucketPercentages)
+            buckets.forEach((bucket, i) => {
+                bucket.label = bucketLabel(i, bucketPercentages)
+            })
+
+            console.log(buckets.map( b => ({
+                label: b.label,
+                count: b.count, 
+                pct: b.pct
+            })))
+
+            // render comments list
+            const bucketContainer = d3.select("#bucketList")
+            bucketContainer
+                .selectAll(".bucket")
+                .data(buckets)
+                .enter()
+                .append("div")
+                .attr("class", "bucket")
+                .html(d => 
+                    `<div>${d.label}</div>
+                     <div style="font-size: 12px; opacity:0.7">
+                        ${d.count} threads
+                     </div>`
+                )
+
+            // render radial tree
+            function render(roots) {
+                const chart = document.getElementById("chart")
+                const size = Math.min(chart.clientWidth, chart.clientHeight)
+
+                const width = size
+                const radius = width / 2
+
+                const tree = d3.tree()
+                    .size([2 * Math.PI, radius - 60])
+
+                const svgRoot = d3.select("svg")
+                    .attr("width", width)
+                    .attr("height", width)
+
+                // clear previous chart
+                svgRoot.selectAll("*").remove()
+
+                const svg = d3.select("svg")
+                    .append("g")
+                    .attr("transform", `translate(${radius}, ${radius})`)
+                
+                const filteredRoot = {
+                    name: "post",
+                    children: roots
+                }
+
+                const root = d3.hierarchy(filteredRoot)
+                tree(root)
+
+                // links
+                svg.append("g")
+                    .selectAll("path")
+                    .data(root.links())
+                    .enter()
+                    .append("path")
+                    .attr("class", "link")
+                    .attr("d", d3.linkRadial()
+                        .angle(d => d.x)
+                        .radius(d => d.y))
+
+                //nodes
+                const node = svg.append("g")
+                    .selectAll("g")
+                    .data(root.descendants())
+                    .enter()
+                    .append("g")
+                    .attr("class", "node")
+                    .attr("transform", d => `
+                        rotate(${d.x * 180 / Math.PI - 90})
+                        `)
+                node.append("circle").attr("r", 3)
+
+                node.append("title")
+                    .text(d => `${d.data.author || ""}\n${d.data.comment || ""}`)
 
 
-            const svg = d3.select("svg")
-            .append("g")
-            .attr("transform", `translate(${radius},${radius})`);
+            }
 
-
-            // Color scale by depth
-            const color = d3.scaleSequential()
-            .domain([0, 8])
-            .interpolator(d3.interpolateCool);
-
-
-            // Node size based on score
-            const scoreExtent = d3.extent(root.descendants(), d => d.data.score || 1);
-            const sizeScale = d3.scaleSqrt().domain(scoreExtent).range([2, 10]);
-
-
-            // Links
-            svg.append("g")
-            .selectAll("path")
-            .data(root.links())
-            .enter()
-            .append("path")
-            .attr("class", "link")
-            .attr("d", d3.linkRadial()
-            .angle(d => d.x)
-            .radius(d => d.y));
-
-
-            // Nodes
-            const node = svg.append("g")
-            .selectAll("g")
-            .data(root.descendants())
-            .enter()
-            .append("g")
-            .attr("class", "node")
-            .attr("transform", d => `
-            rotate(${d.x * 180 / Math.PI - 90})
-            translate(${d.y},0)
-            `);
-
-
-            node.append("circle")
-            .attr("r", d => sizeScale(d.data.score || 1))
-            .attr("fill", d => color(d.depth));
-            });
+            // make buckets clickable
+            d3.selectAll(".bucket")
+                .on("click", function(event, d) {
+                    d3.selectAll(".bucket").classed("active", false)
+                    d3.select(this).classed("active", true)
+                    render(d.roots)
+                })
+            
+            render(buckets[0].roots)
+            d3.select(".bucket").classed("active", true)
+        })
     </script>
 </body>
 </html>
