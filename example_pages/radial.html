@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reddit Comments - Radial Tree</title>
+     <!-- Additional icon fonts. Wunderbaum uses bootstrap icons by default. -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+    />
+    <!-- Wunderbaum CSS and Library -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/wunderbaum@0/dist/wunderbaum.min.css"
+    />
     <style>
         body { font-family: sans-serif; background:#0f172a; color:white; }
         .link { fill: none; stroke: #64748b; stroke-opacity: 0.4; }
@@ -55,6 +65,15 @@
         font-weight: bold;
         }
 
+        #commentTree {
+            width: 600px;
+            max-height: 500px;
+            font-size: x-small;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 5px;
+            margin-right: 50px;
+        }
     </style>
 </head>
 <body>
@@ -68,17 +87,18 @@
         </div>
         <div id="chart">
         </div>
-        <div id="threadViewer"></div>
+        <div id="commentTree"></div>
     </div>
     <script type="module">
         import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm"
+        import * as wunderbaum from "https://cdn.jsdelivr.net/npm/wunderbaum@0/+esm"
         import App from "./js/app.js"
 
         const data = d3.json("1qxc496_comment_tree.json")
 
         
         data.then(d => {
-            const app = new App(d3)
+            const app = new App(d3, wunderbaum)
             app.run(d)
         })
     </script>
