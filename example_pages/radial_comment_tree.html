@@ -67,8 +67,9 @@
             </div>
         </div>
         <div id="chart">
-            <svg width="1800" height="1800"></svg>
+            <svg width="2500" height="2500"></svg>
         </div>
+        <div id="threadViewer"></div>
     </div>
     <script type="module">
         import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm"
@@ -310,10 +311,33 @@
                     .enter()
                     .append("g")
                     .attr("class", "node")
-                    .attr("transform", d => `
-                        rotate(${d.x * 180 / Math.PI - 90})
-                        `)
-                node.append("circle").attr("r", 3)
+                    .attr("transform", d => `rotate(${d.x * 180 / Math.PI - 90}) translate(${d.y},0)`)
+                    .on("click", function(event, d) {
+                        console.log(d)
+                        console.log(event.type)
+
+                    })
+                    .on("mouseenter", function(event, d) {
+                        d3.select(this).raise()
+                            .select("circle")
+                            .transition()
+                            //.duration(150)
+                            .attr("r", 5)
+                        
+                        console.log(this)
+                    })
+                    .on("mouseleave", function(event, d) {
+                        d3.select(this)
+                            .select("circle")
+                            .transition()
+                            //.duration(150)
+                            .attr("r", 1)
+                        console.log(event.type)
+                    })
+
+
+                
+                node.append("circle").attr("r", 1)
 
                 node.append("title")
                     .text(d => `${d.data.author || ""}\n${d.data.comment || ""}`)
@@ -321,15 +345,47 @@
 
             }
 
+            function renderComments(roots) {
+                return roots.map(node => {
+                    const depth = node.depth
+                    const commentId = node.data.name
+                    const author = node.data.author
+                    const score = node.data.score
+                    const comment = node.data.body
+
+                    let html = `
+                        <div style="margin-left:${depth * 2}px">
+                            <ul>
+                                <li>Comment Id: ${commentId}</li>
+                                <li>Author: ${author}</li>
+                                <li> Score: ${score}</li>
+                                <li>${comment}</li>
+                            </ul>
+                        </div>
+                    `
+
+                    if (node.children.length > 0) {
+                        html.concat(node.children)
+                    }
+                    return html
+                })
+            }
+                
+
             // make buckets clickable
             d3.selectAll(".bucket")
                 .on("click", function(event, d) {
                     d3.selectAll(".bucket").classed("active", false)
                     d3.select(this).classed("active", true)
                     render(d.roots)
+                   // renderComments(d.roots)
                 })
             
             render(buckets[0].roots)
+            console.log(buckets[0].roots)
+            const commentTreeHTML = renderComments(buckets[0].roots)
+            console.log(commentTreeHTML)
+            document.getElementById("threadViewer").innerHTML = commentTreeHTML
             d3.select(".bucket").classed("active", true)
         })
     </script>
