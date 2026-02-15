@@ -15,7 +15,7 @@ function onNodeMouseLeave(d3, event, data, domElement) {
 }
 
 function onNodeClick(d3, event, data, domElement) {
-    console.log(data)
+    //console.log(data)
 }
 
 function onBucketClick(d3, event, data, domElement) {

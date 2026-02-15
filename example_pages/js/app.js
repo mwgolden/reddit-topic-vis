@@ -19,6 +19,16 @@ export default class App {
             commentTree.updateTree(bucket.root)
         })
 
+        commentTree.onNodeActivate(e => {
+            //console.log("A node was activated")
+            //console.log(e.node.data._sourceData)
+        })
+
+        radial.onNodeClick( (event, data, node) => {
+            commentTree.focusOnNode(data.data.name)
+            radial.focusOnNode(data)
+        })
+
         const bucketStrategy = new SkewedBucketStrategy(data)
 
         const bucketArray = bucketStrategy.mapCommentsToBuckets()
@@ -26,10 +36,10 @@ export default class App {
         radial.render(bucketArray[0].root)
 
         buckets.render(bucketArray)
-
         //console.log(bucketArray[0].root)
 
         commentTree.render(bucketArray[0].root)
+
 
         this.d3.select(".bucket").classed("active", true)
     }

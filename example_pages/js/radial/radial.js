@@ -6,7 +6,34 @@ export class Radial {
         this.chart = document.getElementById(id)
         this.chartWidth = Math.min(this.chart.clientWidth, this.chart.clientHeight)
         this.chartRadius = this.chartWidth / 2
+        this.clickHandler = null
     }
+
+    onNodeClick(callback) {
+        this.clickHandler = callback
+    }
+
+    focusOnNode(node) {
+        const d3 = this.d3
+
+        console.log("focus on radial node")
+        const cx = node.y * Math.cos(node.x - Math.PI/2)
+        const cy = node.y * Math.sin(node.x - Math.PI/2)
+
+        const svg = d3.select(self.chart).select("svg")
+        console.log(svg)
+        const g = svg.select("g#radial-tree")
+        const width = +svg.height
+        const height = +svg.height
+
+        const scale = 1.2  // optional zoom factor
+        const translateX = width/2 - cx * scale
+        const translateY = height/2 - cy * scale
+
+        g.transition()
+            .duration(750)
+            .attr("transform", `translate(${translateX},${translateY}) scale(${scale})`)
+    } 
 
     render(root) {
 
@@ -28,6 +55,7 @@ export class Radial {
 
         const svg = svgRoot
             .append("g")
+                .attr("id", "radial-tree")
                 .attr("transform", `translate(${self.chartRadius}, ${self.chartRadius})`)
 
         
@@ -37,6 +65,7 @@ export class Radial {
 
         // links
         svg.append("g")
+                .attr("id", "radial-links")
             .selectAll("path")
             .data(hierarchy.links())
             .enter()
@@ -48,6 +77,7 @@ export class Radial {
 
         //nodes
         const node = svg.append("g")
+                .attr("id", "radial-nodes")
             .selectAll("g")
             .data(hierarchy.descendants())
             .enter()
@@ -56,7 +86,11 @@ export class Radial {
             .attr("transform", d => `rotate(${d.x * 180 / Math.PI - 90}) translate(${d.y},0)`)
             .on(Object.keys(nodeEvents).join(" "), function(event, d){
                 const handler = nodeEvents[event.type]
-               handler(d3, event, d, this)
+                handler(d3, event, d, this)
+
+                if (event.type == "click" && self.clickHandler) {
+                    self.clickHandler(event, d, this)
+                }
             })
         
         node.append("circle").attr("r", 1)
