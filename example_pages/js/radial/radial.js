@@ -7,6 +7,7 @@ export class Radial {
         this.chartWidth = Math.min(this.chart.clientWidth, this.chart.clientHeight)
         this.chartRadius = this.chartWidth / 2
         this.clickHandler = null
+        this.scale = 1
     }
 
     onNodeClick(callback) {
@@ -15,30 +16,28 @@ export class Radial {
 
     focusOnNode(node) {
         const d3 = this.d3
-
-        console.log("focus on radial node")
+        const g = d3.select(this.chart).select("g#radial-tree")
 
         // convert polar to Cartesian
-        const cx = node.y * Math.cos(node.x - Math.PI / 2)
-        const cy = node.y * Math.sin(node.x - Math.PI / 2)
+        const cx = node.y * Math.cos(node.x - Math.PI/2)
+        const cy = node.y * Math.sin(node.x - Math.PI/2)
 
-        // select SVG and main group
+        // select current scale
+        const scale = this.scale || 1
+
         const svg = d3.select(this.chart).select("svg")
-        const g = svg.select("g#radial-tree")
-
-        // get numeric width/height
         const width = +svg.attr("width")
         const height = +svg.attr("height")
 
-        const scale = 1.2 // optional zoom
-        const translateX = width / 2 - cx * scale
-        const translateY = height / 2 - cy * scale
+        // compute translation to center node
+        const translateX = width/2 - cx * scale
+        const translateY = height/2 - cy * scale
 
-        // smooth transition
         g.transition()
         .duration(750)
         .attr("transform", `translate(${translateX},${translateY}) scale(${scale})`)
     }
+
 
     render(root) {
 
@@ -57,11 +56,22 @@ export class Radial {
             .append("svg")
                 .attr("width", self.chartWidth)
                 .attr("height", self.chartWidth)
+                
 
         const svg = svgRoot
             .append("g")
                 .attr("id", "radial-tree")
                 .attr("transform", `translate(${self.chartRadius}, ${self.chartRadius})`)
+
+        const zoom = d3.zoom()
+            .scaleExtent([0.5, 5])
+            .on("zoom", (event) => {
+                self.scale = event.transform.k
+                svg.attr("transform", `translate(${event.transform.x + self.chartRadius}, ${event.transform.y + self.chartRadius}) scale(${event.transform.k})`)
+            })
+
+        // attach zoom to the SVG
+        svgRoot.call(zoom)
 
         
 
@@ -100,7 +110,7 @@ export class Radial {
         
         node.append("circle").attr("r", 1)
         node.append("title")
-            .text(d => `${d.data.author || ""}\n${d.data.comment || ""}`)
+            .text(d => `${d.data.author || ""}\n${d.data.comment || ""}`)       
 
     }
 }
