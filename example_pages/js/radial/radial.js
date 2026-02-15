@@ -17,23 +17,28 @@ export class Radial {
         const d3 = this.d3
 
         console.log("focus on radial node")
-        const cx = node.y * Math.cos(node.x - Math.PI/2)
-        const cy = node.y * Math.sin(node.x - Math.PI/2)
 
-        const svg = d3.select(self.chart).select("svg")
-        console.log(svg)
+        // convert polar to Cartesian
+        const cx = node.y * Math.cos(node.x - Math.PI / 2)
+        const cy = node.y * Math.sin(node.x - Math.PI / 2)
+
+        // select SVG and main group
+        const svg = d3.select(this.chart).select("svg")
         const g = svg.select("g#radial-tree")
-        const width = +svg.height
-        const height = +svg.height
 
-        const scale = 1.2  // optional zoom factor
-        const translateX = width/2 - cx * scale
-        const translateY = height/2 - cy * scale
+        // get numeric width/height
+        const width = +svg.attr("width")
+        const height = +svg.attr("height")
 
+        const scale = 1.2 // optional zoom
+        const translateX = width / 2 - cx * scale
+        const translateY = height / 2 - cy * scale
+
+        // smooth transition
         g.transition()
-            .duration(750)
-            .attr("transform", `translate(${translateX},${translateY}) scale(${scale})`)
-    } 
+        .duration(750)
+        .attr("transform", `translate(${translateX},${translateY}) scale(${scale})`)
+    }
 
     render(root) {
 
