@@ -16,6 +16,7 @@ export default class App {
 
         buckets.onBucketClick(bucket => {
             radial.render(bucket.root)
+            commentTree.__setCommentTree(bucket.root)
             commentTree.updateTree(bucket.root)
         })
 

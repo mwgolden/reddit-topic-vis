@@ -42,6 +42,10 @@ export class CommentTree {
         if (this.tree) { this.tree.load([wbComments]) }
     }
 
+    __setCommentTree(comments) {
+        this.fullComments = comments
+    }
+
     render(comments) {
         self = this
         const wbComments = this.d3ToWunderbaum(comments)

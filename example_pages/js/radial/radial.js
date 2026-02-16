@@ -7,6 +7,7 @@ export class Radial {
         this.chartWidth = Math.min(this.chart.clientWidth, this.chart.clientHeight)
         this.chartRadius = this.chartWidth / 2
         this.clickHandler = null
+        this.zoom = null  // only create one zoom per svg
         this.scale = 1
     }
 
@@ -16,27 +17,28 @@ export class Radial {
 
     focusOnNode(node) {
         const d3 = this.d3
-        const g = d3.select(this.chart).select("g#radial-tree")
+        const svgRoot = d3.select(this.chart).select("svg")
 
-        // convert polar to Cartesian
         const cx = node.y * Math.cos(node.x - Math.PI/2)
         const cy = node.y * Math.sin(node.x - Math.PI/2)
 
-        // select current scale
+        const width = +svgRoot.attr("width")
+        const height = +svgRoot.attr("height")
+
         const scale = this.scale || 1
 
-        const svg = d3.select(this.chart).select("svg")
-        const width = +svg.attr("width")
-        const height = +svg.attr("height")
+        const tx = width/2 - cx * scale
+        const ty = height/2 - cy * scale
 
-        // compute translation to center node
-        const translateX = width/2 - cx * scale
-        const translateY = height/2 - cy * scale
+        const newTransform = d3.zoomIdentity
+            .translate(tx, ty)
+            .scale(scale)
 
-        g.transition()
-        .duration(750)
-        .attr("transform", `translate(${translateX},${translateY}) scale(${scale})`)
+        svgRoot.transition()
+            .duration(750)
+            .call(this.zoom.transform, newTransform)
     }
+
 
 
     render(root) {
@@ -61,18 +63,22 @@ export class Radial {
         const svg = svgRoot
             .append("g")
                 .attr("id", "radial-tree")
-                .attr("transform", `translate(${self.chartRadius}, ${self.chartRadius})`)
 
-        const zoom = d3.zoom()
+        self.zoom = d3.zoom()
             .scaleExtent([0.5, 5])
             .on("zoom", (event) => {
                 self.scale = event.transform.k
-                svg.attr("transform", `translate(${event.transform.x + self.chartRadius}, ${event.transform.y + self.chartRadius}) scale(${event.transform.k})`)
+                svg.attr("transform", event.transform)
             })
 
         // attach zoom to the SVG
-        svgRoot.call(zoom)
+        svgRoot.call(self.zoom)
 
+        // set initial transform using same zoom instance
+        svgRoot.call(
+            self.zoom.transform,
+            d3.zoomIdentity.translate(self.chartRadius, self.chartRadius).scale(1)
+        )
         
 
         const hierarchy = d3.hierarchy(root)
