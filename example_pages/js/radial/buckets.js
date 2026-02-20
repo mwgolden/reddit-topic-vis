@@ -14,18 +14,22 @@ export class Buckets {
     render(buckets) {
         const self = this
         const d3 = self.d3
-        const bucketSel = self.d3.select(self.bucketContainer)
+        const listGroup = self.d3.select(self.bucketContainer)
+            .append("ul")
+                .attr("class", "list-group")
 
-        bucketSel
-            .selectAll(".bucket")
+        listGroup
+            .selectAll(".list-group-item")
             .data(buckets, d => d.index)
-            .join("div")
-            .attr("class", "bucket")
+            .join("li")
+            .attr("class", "bucket list-group-item")
             .html(bucket => 
-                    `<div>${bucket.label}</div>
-                     <div style="font-size: 12px; opacity:0.7">
-                        ${bucket.count} threads
-                     </div>`
+                    `
+                    <div>${bucket.label}</div>
+                        <div style="font-size: 12px; opacity:0.7">
+                            ${bucket.count} threads
+                        </div>
+                    `
                 )
             .on(Object.keys(bucketEvents).join(" "), function(event, d){
                 const handler = bucketEvents[event.type]
