@@ -1,6 +1,6 @@
 class SkewedBucketStrategy {
-    constructor(root) {
-        this.root = root
+    constructor(comments) {
+        this.root = comments.root
         this.bucketPercentages = [0.01, 0.03, 0.07, 0.14, 0.25, 0.50] // percent of comments after ordering by score
     }
 
