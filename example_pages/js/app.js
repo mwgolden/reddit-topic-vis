@@ -1,6 +1,6 @@
 import { Radial } from "./radial/radial.js"
 import { Buckets } from "./radial/buckets.js"
-import { CommentTree } from "./radial/commentTree.js"
+import { CommentTree } from "./radial/commentSlider.js"
 import { SkewedBucketStrategy } from "./radial/bucketStrategy.js"
 
 export default class App {
