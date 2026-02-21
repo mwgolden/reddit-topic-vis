@@ -4,7 +4,7 @@ export class Radial {
     constructor(id, d3) {
         this.d3 = d3
         this.chart = document.getElementById(id)
-        this.chartWidth = Math.min(this.chart.clientWidth, this.chart.clientHeight)
+        this.chartWidth = Math.max(window.innerWidth, window.innerHeight) / 2
         this.chartRadius = this.chartWidth / 2
         this.clickHandler = null
         this.zoom = null  // only create one zoom per svg

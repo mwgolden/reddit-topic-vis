@@ -16,13 +16,14 @@ export default class App {
 
         buckets.onBucketClick(bucket => {
             radial.render(bucket.root)
-            commentTree.__setCommentTree(bucket.root)
+            commentTree._setCommentTree(bucket.root)
             commentTree.updateTree(bucket.root)
         })
 
         commentTree.onNodeActivate(e => {
             //console.log("A node was activated")
             //console.log(e.node.data._sourceData)
+            //radial.focusOnNode(e.node.data)
         })
 
         radial.onNodeClick( (event, data, node) => {

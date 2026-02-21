@@ -4,91 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reddit Comments - Radial Tree</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
      <!-- Additional icon fonts. Wunderbaum uses bootstrap icons by default. -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
     />
-    <!-- Wunderbaum CSS and Library -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/wunderbaum@0/dist/wunderbaum.min.css"
-    />
-    <style>
-        body { font-family: sans-serif; background:#0f172a; color:white; }
-        .link { fill: none; stroke: #64748b; stroke-opacity: 0.4; }
-        .node circle { fill: #38bdf8; }
-        .node text { font-size: 10px; fill: #e2e8f0; }
-         /*svg { display:block; margin:auto; width:100%; height:100%; } */
-
-        #layout {
-        display: flex;
-        height: 100vh;
-        }
-
-        #sidebar {
-        width: 240px;
-        background: #020617;
-        border-right: 1px solid #1e293b;
-        padding: 16px;
-        }
-
-        #chart {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        }
-
-        svg {
-        width: 98vmin;
-        height: 98vmin;
-        }
-
-        .bucket {
-        background: #0f172a;
-        border: 1px solid #334155;
-        border-radius: 8px;
-        padding: 10px;
-        margin-bottom: 10px;
-        cursor: pointer;
-        transition: 0.2s;
-        }
-
-        .bucket:hover {
-        background: #1e293b;
-        }
-
-        .bucket.active {
-        background: #38bdf8;
-        color: black;
-        font-weight: bold;
-        }
-
-        #commentTree {
-            width: 600px;
-            max-height: 500px;
-            font-size: x-small;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            padding: 5px;
-            margin-right: 50px;
-        }
-    </style>
+    <link rel="stylesheet" href="../css/main.css"/>
 </head>
 <body>
     <h2 style="text-align:center">Reddit Comment Radial Tree</h2>
-    <div id="layout">
-        <div id="sidebar">
-            <h3>Comment Buckets</h3>
-            <div id="bucketList">
-
+    <div id="layout" class="container">
+        <div class="row">
+            <div id="sidebar" class="col-2">
+                    <div id="bucketList"></div>
             </div>
+           
         </div>
-        <div id="chart">
+        <div class="row" class="col-12">
+            <div id="chart"></div>
+            <div id="commentTree" class="col-sm"></div> 
         </div>
-        <div id="commentTree"></div>
     </div>
+       
     <script type="module">
         import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm"
         import * as wunderbaum from "https://cdn.jsdelivr.net/npm/wunderbaum@0/+esm"
