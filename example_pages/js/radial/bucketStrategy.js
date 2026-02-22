@@ -30,7 +30,8 @@ class SkewedBucketStrategy {
                 end = cursor + Math.round(numComments * this.bucketPercentages[i])
             }
             const bucketRoot = {
-                name: this.root.name,
+                id: this.root.id,
+                parent: this.root.parent,
                 children: []
             }
             bucketRoot.children = sortedComments.slice(cursor, end)

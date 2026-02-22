@@ -39,7 +39,6 @@
         
         data.then(d => {
             const comments = new Comments(d)
-            console.log(comments.getCommentById("t1_o3vu23r"))
             const app = new App(d3, comments)
             app.run()
         })

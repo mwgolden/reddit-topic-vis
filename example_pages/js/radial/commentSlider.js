@@ -11,7 +11,6 @@ export class CommentSlider {
     }
 
     focusOnNode(comment) {
-       console.log("focus on node")
        this.clearCommentList()
        this.renderCommentList(comment)
        this.commentTree.classList.add("open")
@@ -50,10 +49,10 @@ export class CommentSlider {
         const container = document.createElement("div")
 
         const author = document.createElement("p")
-        author.textContent = comment.author
+        author.textContent = comment.author ?? ""
 
         const text = document.createElement("p")
-        text.textContent = comment.body
+        text.textContent = comment.body ?? ""
 
         li.innerText = comment.author
         li.className = "comment-label"

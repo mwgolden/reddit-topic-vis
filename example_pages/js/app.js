@@ -13,9 +13,12 @@ export default class App {
         const radial = new Radial("chart", this.d3)
         const buckets = new Buckets("bucketList", this.d3)
         const commentTree = new CommentSlider("commentTree", this.comments.root)
-        
+        let currentBucketIndex = 0
+
         buckets.onBucketClick(bucket => {
+            currentBucketIndex = bucket.index
             radial.render(bucket.root)
+            commentTree.focusOnNode(bucketArray[currentBucketIndex].root)
         })
         
         commentTree.onNodeActivate(e => {
@@ -25,10 +28,13 @@ export default class App {
         })
 
         radial.onNodeClick( (event, node, d3Element) => {
-
-            const comment = this.comments.getCommentById(node.data.id)
-            console.log(node.data)
-            commentTree.focusOnNode(comment)
+            const rootNode = node.data.parent == null
+            if(rootNode) {
+                commentTree.focusOnNode(bucketArray[currentBucketIndex].root)
+            } else {
+                const comment = this.comments.getCommentById(node.data.id)
+                commentTree.focusOnNode(comment)
+            }
             radial.focusOnNode(node)
         })
 
@@ -36,12 +42,11 @@ export default class App {
 
         const bucketArray = bucketStrategy.mapCommentsToBuckets()
 
-        radial.render(bucketArray[0].root)
+        radial.render(bucketArray[currentBucketIndex].root)
 
         buckets.render(bucketArray)
-        //console.log(bucketArray[0].root)
 
-        commentTree.render(bucketArray[0].root)
+        commentTree.render(bucketArray[currentBucketIndex].root)
 
 
         this.d3.select(".bucket").classed("active", true)

@@ -1,11 +1,12 @@
 class CommentTree {
-    constructor(data) {
+    constructor(data, parent = null) {
+        this.parent = parent
         this.id = data.name
         this.key = data.name
-        this.author = data.author || undefined
-        this.body = data.body || undefined
+        this.author = data.author ?? ""
+        this.body = data.body ?? ""
         this.score = data.score
-        this.children = data.children ? data.children.map(child => new CommentTree(child)): [],
+        this.children = data.children ? data.children.map(child => new CommentTree(child, data.name)): [],
         this._sourceData =  data
     }
 
@@ -30,8 +31,6 @@ export default class Comments {
         this.root = new CommentTree(comments)
         this.index = new Map() // build a map for O(1) lookups
         this.buildIndex(this.root)
-
-        console.log(this.root)
     }
 
     buildIndex(node) {
@@ -43,7 +42,7 @@ export default class Comments {
     }
 
     getCommentById(id) {
-        return this.index.get(id) || null
+        return this.index.get(id) ?? undefined
     }
 
 }
