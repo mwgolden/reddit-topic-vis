@@ -12,7 +12,7 @@ export default class App {
     run() {
         const radial = new Radial("chart", this.d3)
         const buckets = new Buckets("bucketList", this.d3)
-        const commentTree = new CommentSlider("commentTree", this.comments.root)
+        const commentTree = new CommentSlider("contextPanel", this.comments.root)
         let currentBucketIndex = 0
 
         buckets.onBucketClick(bucket => {

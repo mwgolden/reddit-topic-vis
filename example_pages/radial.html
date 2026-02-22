@@ -4,28 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reddit Comments - Radial Tree</title>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-     <!-- Additional icon fonts. Wunderbaum uses bootstrap icons by default. -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
-    />
     <link rel="stylesheet" href="../css/main.css"/>
 </head>
 <body>
-    <h2 style="text-align:center">Reddit Comment Radial Tree</h2>
-    <div id="layout" class="container">
-        <div class="row">
-            <div id="sidebar" class="col-2">
-                    <div id="bucketList"></div>
-            </div>
-           
-        </div>
-        <div class="row" class="col-12">
+    <h2 class="text-center mt-2">Reddit Comment Radial Tree</h2>
+
+    <div id="appLayout">
+
+        <!-- Left Sidebar -->
+        <aside id="sidebar">
+            <div id="bucketList"></div>
+        </aside>
+
+        <!-- Radial Canvas Area -->
+        <main id="radialContainer">
             <div id="chart"></div>
-            <div id="commentTree" class="col-sm"></div> 
-        </div>
+        </main>
+
+        <!-- Context Aware Side Panel -->
+        <aside id="contextPanel">
+            <div class="panel-header d-flex justify-content-between align-items-center p-2">
+                <h6 class="mb-0">Thread Insights</h6>
+                <button id="closePanel" class="btn btn-sm btn-dark">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+
+            <div class="panel-body p-2">
+                <div id="nodeMeta"></div>
+                <hr />
+                <div id="wordCloud"></div>
+                <hr />
+                <div id="stats"></div>
+            </div>
+        </aside>
+
     </div>
        
     <script type="module">
@@ -41,6 +54,8 @@
             const app = new App(d3, comments)
             app.run()
         })
+
+        window.addEventListener("resize", () => app.resize())
     </script>
 </body>
 </html>
