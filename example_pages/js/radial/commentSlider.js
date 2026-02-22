@@ -13,7 +13,7 @@ export class CommentSlider {
     focusOnNode(comment) {
        console.log("focus on node")
        this.clearCommentList()
-       this.render(comment)
+       this.renderCommentList(comment)
        this.commentTree.classList.add("open")
        
     }
@@ -26,6 +26,20 @@ export class CommentSlider {
         if(target) {
             target.remove()
         }
+    }
+
+    renderCommentList(comments) {
+        self = this
+        const tree = [comments]
+        
+        const ul = document.createElement("ul")
+        ul.className = "comment-list"
+
+        tree.forEach(comment => {
+            ul.appendChild(this.renderComment(comment))
+        });
+
+        self.commentTree.appendChild(ul)
     }
 
     renderComment(comment) {
@@ -76,14 +90,8 @@ export class CommentSlider {
 
     render(comments) {
         self = this
-        const tree = [comments]
-        
-        const ul = document.createElement("ul")
-        ul.className = "comment-list"
 
-        tree.forEach(comment => {
-            ul.appendChild(this.renderComment(comment))
-        });
+        self.renderCommentList(comments)
 
         const closeButton = document.createElement("button")
         closeButton.className = "btn btn-link"
@@ -91,7 +99,5 @@ export class CommentSlider {
         closeButton.innerText = "x"
         closeButton.onclick = (event) => {self.commentTree.classList.remove("open")}
         self.commentTree.appendChild(closeButton)
-
-        self.commentTree.appendChild(ul)
     }
 }
