@@ -57,9 +57,109 @@ body {
     transform: translateX(0);
 }
 
+#contextPanel button {
+    background: none!important;
+    border: none;
+    padding: 0!important;
+    color:#069;
+    text-decoration: none;
+}
+
+#contextPanel ul {
+    list-style-type: none;
+}
+
 .panel-body {
     overflow-y: auto;
     font-size: 0.8rem;
+}
+
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+
+  width: 32px;
+  height: 32px;
+
+  border: none;
+  background: transparent;
+
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1;
+
+  color: #888;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+/* Hover */
+.close-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #000;
+}
+
+.comment {
+  position: relative;
+}
+
+.btn.caret-btn {
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin-right: 6px;
+
+  width: 20px;
+  height: 20px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  color: #aaa;
+
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+/* Hover */
+.btn.caret-btn:hover {
+  color: #333;
+}
+
+/* Rotate when expanded */
+.btn.caret-btn[aria-expanded="true"] {
+  transform: rotate(90deg);
+}
+
+/* Icon sizing */
+.btn.caret-btn i {
+  font-size: 12px;
+  line-height: 1;
+}
+
+/* Hide children smoothly */
+.comment-list {
+  margin-left: 20px;
+  transition: all 0.2s ease;
+}
+
+/* Active */
+.close-btn:active {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* Keyboard accessibility */
+.close-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
 }
 
 /* ---- D3 Styling ---- */
@@ -84,4 +184,8 @@ body {
 .bi-caret-right-fill {
     color: #bbb;
     font-size: 0.75rem;
+}
+
+.comment-list.hidden {
+    display: none;
 }

@@ -55,15 +55,14 @@ export class CommentSlider {
         text.textContent = comment.body ?? ""
 
         li.innerText = comment.author
-        li.className = "comment-label"
         li.appendChild(container)
         container.appendChild(text)
 
         if (comment.children.length > 0) {
 
             const toggleBtn = document.createElement("button")
-            toggleBtn.className = "btn btn-link text-body p-0 border-0 mb-2"
-            toggleBtn.innerHTML = `<i class="bi bi-caret-down-fill me-1 opacity-50"></i>`
+            toggleBtn.className = "btn caret-btn"
+            toggleBtn.innerHTML = `<i class="bi bi-caret-down"></i>`
 
             const childList = document.createElement("ul")
             childList.className = "comment-list"
@@ -73,10 +72,10 @@ export class CommentSlider {
             )
 
             toggleBtn.onclick = () => {
-                const collapsed = childList.classList.toggle("d-none")
+                const collapsed = childList.classList.toggle("hidden")
                 toggleBtn.innerHTML = collapsed
-                    ? `<i class="bi bi-caret-right-fill me-1 opacity-50"></i>`
-                    : `<i class="bi bi-caret-down-fill me-1 opacity-50"></i>`
+                    ? `<i class="bi bi-caret-right"></i>`
+                    : `<i class="bi bi-caret-down"></i>`
             }
 
             li.insertBefore(toggleBtn, li.firstChild)
@@ -92,11 +91,7 @@ export class CommentSlider {
 
         self.renderCommentList(comments)
 
-        const closeButton = document.createElement("button")
-        closeButton.className = "btn btn-link"
-        closeButton.id = "comment-tree-close-button"
-        closeButton.innerText = "x"
+        const closeButton = document.getElementById("comment-tree-close-button")
         closeButton.onclick = (event) => {self.commentTree.classList.remove("open")}
-        self.commentTree.appendChild(closeButton)
     }
 }
