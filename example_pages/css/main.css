@@ -49,6 +49,14 @@ h2 {
   transition: background-color 0.3s;
 }
 
+.list-group-item.active {
+  background: #6e98dc;
+  border: 1px solid #6e98dc;
+  color: #000;
+  transition: background-color 0.3s;
+}
+
+
 
 /* ---- Radial Container ---- */
 
