@@ -80,7 +80,7 @@ export class Radial {
         tree(hierarchy)
 
         // links
-        zoomContainer.append("g")
+        const links = zoomContainer.append("g")
                 .attr("id", "radial-links")
             .selectAll("path")
             .data(hierarchy.links())
@@ -101,10 +101,11 @@ export class Radial {
             .enter()
             .append("g")
             .attr("class", "node")
+            .attr("id", d => d.data.id)
             .attr("transform", d => `rotate(${d.x * 180 / Math.PI - 90}) translate(${d.y},0)`)
             .on(Object.keys(nodeEvents).join(" "), function(event, d){
                 const handler = nodeEvents[event.type]
-                handler(d3, event, d, this)
+                handler(d3, event, d, links, this)
 
                 if (event.type == "click" && self.clickHandler) {
                     self.clickHandler(event, d, this)
@@ -112,8 +113,6 @@ export class Radial {
             })
         
         node.append("circle").attr("r", 1)
-        node.append("title")
-            .text(d => `${d.data.author || ""}\n${d.data.comment || ""}`)       
 
     }
 }
