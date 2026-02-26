@@ -1,4 +1,9 @@
-
+function highlightRadialLinks(links, related_links) {
+    links.classed("highlight", l =>
+        related_links.has(l.source) &&
+        related_links.has(l.target)
+    )
+}
 
 function onNodeMouseEnter(d3, event, data, links, domElement) {
     d3.select(domElement).raise()
@@ -13,10 +18,7 @@ function onNodeMouseEnter(d3, event, data, links, domElement) {
         ...data.descendants()
     ])
 
-    links.classed("highlight", l =>
-        related_links.has(l.source) &&
-        related_links.has(l.target)
-    )
+    highlightRadialLinks(links, related_links)
 }
 
 function onNodeMouseLeave(d3, event, data, links, domElement) {
