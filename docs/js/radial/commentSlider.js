@@ -39,23 +39,25 @@ export class CommentSlider {
         });
 
         self.commentTree.appendChild(ul)
+        self.commentTree.className = "open"
     }
 
     renderComment(comment) {
         const li = document.createElement("li")
         li.className = "comment"
 
-        const container = document.createElement("div")
-
-        const author = document.createElement("p")
-        author.textContent = comment.author ?? ""
-
-        const text = document.createElement("p")
-        text.textContent = comment.body ?? ""
-
         li.innerText = comment.author ?? comment.id
-        li.appendChild(container)
-        container.appendChild(text)
+
+
+        if(comment.body !== undefined) {
+            const container = document.createElement("div")
+            const text = document.createElement("p")
+            text.className = "comment-text"
+            text.textContent = comment.body
+            li.appendChild(container)
+            container.appendChild(text)
+        }
+        
 
         if (comment.children.length > 0) {
 

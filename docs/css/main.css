@@ -76,7 +76,7 @@ h2 {
 /* ---- Context Panel ---- */
 
 #contextPanel {
-    width: 420px;
+    width: 0;
     background: #1e293b;
     border-left: 1px solid #334155;
     display: flex;
@@ -91,6 +91,7 @@ h2 {
 
 #contextPanel.open {
     transform: translateX(0);
+    width: 640px;
 }
 
 #contextPanel button {
@@ -103,6 +104,11 @@ h2 {
 
 #contextPanel ul {
     list-style-type: none;
+    padding: 0 0 1px 0;
+}
+
+#contextPanel .comment-text {
+  padding: 0em 0em 0em 3em;
 }
 
 .panel-body {
