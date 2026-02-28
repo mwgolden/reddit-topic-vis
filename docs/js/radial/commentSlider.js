@@ -42,7 +42,6 @@ export class CommentSlider {
     }
 
     renderComment(comment) {
-
         const li = document.createElement("li")
         li.className = "comment"
 
@@ -54,7 +53,7 @@ export class CommentSlider {
         const text = document.createElement("p")
         text.textContent = comment.body ?? ""
 
-        li.innerText = comment.author
+        li.innerText = comment.author ?? comment.id
         li.appendChild(container)
         container.appendChild(text)
 
