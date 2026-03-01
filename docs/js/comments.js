@@ -1,3 +1,5 @@
+import { STOP_WORDS, PROFANITY_WORDS } from "./stopWords.js"
+
 class CommentTree {
     constructor(data, parent = null) {
         this.parent = parent
@@ -8,6 +10,18 @@ class CommentTree {
         this.score = data.score
         this.children = data.children ? data.children.map(child => new CommentTree(child, data.name)): [],
         this._sourceData =  data
+        this.tokens = this.tokenizeComment(data.body ?? "")
+    }
+
+    tokenizeComment(commentBody) {
+        const stopWords = new Set([...STOP_WORDS, ...PROFANITY_WORDS]);
+        const tokens = commentBody
+        .toLowerCase()
+        .replace(/(^|\s)'|'(\s|$)/g, " ")       // remove stray apostrophes
+        .match(/\p{L}[\p{L}\p{N}']*/gu) || [];
+
+        const filteredTokens = tokens.filter(t => !stopWords.has(t));
+        return new Set(filteredTokens)
     }
 
     findById(id) {
